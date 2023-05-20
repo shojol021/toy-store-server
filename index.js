@@ -5,7 +5,13 @@ const port = process.env.port || 3000
 require('dotenv').config()
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
-app.use(cors())
+const corsOptions ={
+    origin:'*',
+    credentials:true,
+    optionSuccessStatus:200,
+    }
+    app.use(cors(corsOptions))
+
 app.use(express.json())
 
 
@@ -49,6 +55,19 @@ async function run() {
             console.log(toyDetails)
             const result = await toysCollection.insertOne(toyDetails)
             res.send(result)
+        })
+
+        app.put('/toys/:id', async(req, res) => {
+            const id = req.params.id;
+            const updatedDetails = req.body;
+            console.log(updatedDetails)
+            // const filter = {_id: id}
+            // const updatedDoc = {
+            //     Set$: {
+            //         price: updatedDetails.price
+            //     }
+            // }
+            // const result = await toysCollection.updateOne(filter)
         })
 
         app.delete('/delete/:id', async(req, res) => {
