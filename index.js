@@ -28,17 +28,18 @@ async function run() {
         const toysCollection = client.db('ToyDB').collection('toys')
 
         app.get('/toys', async (req, res) => {
-            console.log(req.query.sellerEmail)
-            console.log(req.body)
+            console.log(req.query)
             let query = {}
             if (req.query.sellerEmail) {
-                query = { sellerEmail: req.query.sellerEmail }
-                const result = await toysCollection.find(query).toArray()
+                query = { sellerEmail: req.query.sellerEmail }  
+            }
+            else if(req.query.search){
+                const searchRegex = new RegExp(req.query.search, 'i');
+                query = { name: searchRegex} 
+            }
+
+            const result = await toysCollection.find(query).toArray()
                 res.send(result)
-            }
-            else{
-                query = { search: req.query.search}
-            }
 
         })
 
