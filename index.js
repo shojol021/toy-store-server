@@ -28,20 +28,34 @@ async function run() {
         const toysCollection = client.db('ToyDB').collection('toys')
 
         app.get('/toys', async (req, res) => {
-            console.log(req.query)
-            let query = {}
+            console.log(req.query);
+            let query = {};
+          
             if (req.query.sellerEmail) {
-                query = { sellerEmail: req.query.sellerEmail }  
+              query = { sellerEmail: req.query.sellerEmail };
+            } else if (req.query.search) {
+              const searchRegex = new RegExp(req.query.search, 'i');
+              query = { name: searchRegex };
             }
-            else if(req.query.search){
-                const searchRegex = new RegExp(req.query.search, 'i');
-                query = { name: searchRegex} 
+          
+            let sortOption = {};
+          
+            if (req.query.sort) {
+              const sortValue = req.query.sort;
+              
+              if (sortValue === 'asc') {
+                sortOption = { price: 1 }; // Sort in ascending order by price
+              } else if (sortValue === 'desc') {
+                sortOption = { price: -1 }; // Sort in descending order by price
+              }
             }
-
-            const result = await toysCollection.find(query).toArray()
-                res.send(result)
-
-        })
+          
+            let result = await toysCollection.find(query).sort(sortOption).toArray();
+          
+            res.send(result);
+          });
+          
+          
 
         app.get('/toys/:id', async (req, res) => {
             const id = req.params.id;
